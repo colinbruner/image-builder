@@ -1,0 +1,64 @@
+{
+  "variables": {
+    "version": "1908",
+    "deploy_password": "CHANGEME!"
+  },
+
+  "builders":
+  [
+    {
+      "type": "qemu",
+      "accelerator": "kvm",
+      "headless": true,
+      "qemuargs": [
+        [ "-m", "2048M" ],
+        [ "-smp", "cpus=2,maxcpus=16,cores=4" ]
+      ],
+      "disk_interface": "virtio",
+      "disk_size": 100000,
+      "format": "qcow2",
+      "net_device": "virtio-net",
+
+      "iso_urls": [
+        "iso/CentOS-7-x86_64-Minimal-{{ user `version` }}.iso",
+        "http://centos.mirror.garr.it/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-{{ user `version` }}.iso"
+      ],
+      "iso_checksum_url": "http://centos.mirror.garr.it/centos/7/isos/x86_64/sha256sum.txt",
+      "iso_checksum_type": "sha256",
+
+      "vnc_bind_address": "0.0.0.0",
+
+      "vm_name": "centos7-base",
+      "output_directory": "centos7-images",
+
+      "http_directory": "http",
+      "http_port_min": 10090,
+      "http_port_max": 10096,
+
+      "ssh_host_port_min": 2230,
+      "ssh_host_port_max": 2236,
+
+      "ssh_username": "deploy",
+      "ssh_password": "{{ user `deploy_password` }}",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "1200s",
+
+      "boot_wait": "40s",
+      "boot_command": [
+        "<up><wait><tab><wait> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos7-ks.cfg<enter><wait>"
+      ],
+
+      "shutdown_command": "echo '{{ user `deploy_password` }}' | sudo -S /sbin/halt -h -p"
+    }
+  ],
+
+  "provisioners":
+  [
+    {
+      "type": "salt-masterless",
+      "local_state_tree": "salt/states",
+      "local_pillar_roots": "salt/pillar",
+      "bootstrap_args": "-x python3"
+    }
+  ]
+}
