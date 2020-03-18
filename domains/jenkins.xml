@@ -1,6 +1,7 @@
+
 <domain type='kvm'>
-  <name>app1</name>
-  <uuid>b8d7388a-bbf2-db3a-e962-b97ca6e514bd</uuid>
+  <name>jenkins</name>
+  <uuid>244e56f2-5699-4dc1-bb35-2f313a6745d0</uuid>
   <memory>2097152</memory>
   <currentMemory>2097152</currentMemory>
   <vcpu>2</vcpu>
@@ -21,7 +22,7 @@
     <emulator>/usr/libexec/qemu-kvm</emulator>
     <disk type='file' device='disk'>
       <driver name='qemu' type='qcow2' cache='none' io='threads'/>
-      <source file='/var/lib/libvirt/images/app1.qcow2'/>
+      <source file='/var/lib/libvirt/images/jenkins.qcow2'/>
       <target dev='vda' bus='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x05' function='0x0'/>
     </disk>
@@ -41,3 +42,4 @@
     </memballoon>
   </devices>
 </domain>
+

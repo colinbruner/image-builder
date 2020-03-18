@@ -1,4 +1,6 @@
 
+centos*
 images/*
 packer_cache/*
 isos/*
+
