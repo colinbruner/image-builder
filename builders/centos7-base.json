@@ -28,8 +28,8 @@
 
       "vnc_bind_address": "0.0.0.0",
 
-      "vm_name": "centos7-base",
-      "output_directory": "centos-7-images",
+      "vm_name": "centos7-base.img",
+      "output_directory": "images/centos7",
 
       "http_directory": "http",
       "http_port_min": 10090,
