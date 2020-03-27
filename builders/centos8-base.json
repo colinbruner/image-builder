@@ -1,7 +1,8 @@
 {
   "variables": {
+    "image_build": "base",
     "version": "8.1.1911",
-    "deploy_password": "CHANGEME!"
+    "deploy_password": "CHANGEME"
   },
 
   "builders":
@@ -15,7 +16,7 @@
         [ "-smp", "cpus=2,maxcpus=16,cores=4" ]
       ],
       "disk_interface": "virtio",
-      "disk_size": 100000,
+      "disk_size": 50000,
       "format": "qcow2",
       "net_device": "virtio-net",
 
@@ -28,8 +29,8 @@
 
       "vnc_bind_address": "0.0.0.0",
 
-      "vm_name": "centos8-base.img",
-      "output_directory": "images/centos8",
+      "vm_name": "centos8-{{ user `image_build` }}.img",
+      "output_directory": "images/{{ user `image_build` }}",
 
       "http_directory": "http",
       "http_port_min": 10090,
@@ -55,10 +56,9 @@
   "provisioners":
   [
     {
-      "type": "salt-masterless",
-      "local_state_tree": "salt/states",
-      "local_pillar_roots": "salt/pillar",
-      "bootstrap_args": "-x python3"
+      "type": "shell",
+      "execute_command": "echo '{{ user `deploy_password` }}' | sudo -S bash {{ .Path }}",
+      "script": "scripts/{{ user `image_build` }}.sh"
     }
   ]
 }

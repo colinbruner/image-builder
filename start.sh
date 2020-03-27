@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function guest_mount {
   # Mount a guest image at a local mount point
   guestmount -a /var/lib/libvirt/images/${1}.img -m /dev/sda1 /mnt
@@ -12,46 +11,34 @@ function convert_img {
 }
 
 function download_img {
+  #if [[ ! -f ${BASE_IMG_PATH} ]]; then
+  #  echo "Downloading image ${IMG_NAME}"
+  #  # Download ubuntu
+  #  curl -o $BASE_IMG_DIR/${IMG_NAME} https://cloud-images.ubuntu.com/daily/server/focal/current/focal-server-cloudimg-amd64.img
+  #else
+  #  echo "Image found at ${BASE_IMG_DIR}/${IMG_NAME}. Skipping download"
+  #fi
+  echo
 
-  # Downloaded image and VM names
-  VM_NAME=${1}
-  IMG_NAME="ubunut.img"
-  # Standard libvirt image directory, BASE and VM image directories built off this.
-  IMG_DIR="/var/lib/libvirt/images"
-  # Path to base img dir and VM image dir
-  BASE_IMG_DIR="/var/lib/libvirt/images/base"
-  VM_IMG_DIR="/var/lib/libvirt/images/${VM_NAME}"
-  # Path to base image and VM image
-  BASE_IMG_PATH="${BASE_IMG_DIR}/${IMG_NAME}"
-  VM_IMG_PATH="${VM_IMG_DIR}/${VM_NAME}.qcow2"
+}
 
-  # Create base/vm img dirs
-  mkdir -p $VM_IMG_DIR
-  mkdir -p $BASE_IMG_DIR
-
-  if [[ ! -f ${BASE_IMG_PATH} ]]; then
-    echo "Downloading image ${IMG_NAME}"
-    # Download ubuntu
-    curl -o $BASE_IMG_DIR/${IMG_NAME} https://cloud-images.ubuntu.com/daily/server/focal/current/focal-server-cloudimg-amd64.img
-  else
-    echo "Image found at ${BASE_IMG_DIR}/${IMG_NAME}. Skipping download"
-  fi
-
-  # Create base img
-  qemu-img create -f qcow2 -o backing_file=${BASE_IMG_PATH} ${VM_IMG_PATH}
-
-  # Resize img
-  qemu-img resize ${VM_IMG_PATH} 20G
-
-  echo $VM_IMG_DIR $VM_NAME
+function create_cloud_init_iso {
   # Create cloud-init ISO
   genisoimage -input-charset utf-8 \
     -output \
-    ${VM_IMG_DIR}/${VM_NAME}-cidata.iso \
+    ${LIBVIRT_BUILD_IMG_DIR}/${VM_NAME}-cidata.iso \
     -volid cidata \
     -joliet \
     -rock cloud-init/*
 
+}
+
+function create_img_resize {
+  # Create base img
+  qemu-img create -f qcow2 -o backing_file=${BUILD_IMG_PATH} ${LIBVIRT_BUILD_IMG_PATH}
+
+  # Resize img
+  qemu-img resize ${BUILD_IMG_PATH} 20G
 }
 
 function install_img {
@@ -70,14 +57,33 @@ function install_img {
     --network type='direct',trustGuestRxFilters='no',source='eno1',source.mode='bridge' \
     --import \
     --noautoconsole
-  virsh domifaddr ${1}
+
+  dig ${VM_NAME}.home +short
+
 }
 
 #TODO: Map this later using OS_FAMILY
-#OS_VARIANT=centos7.0
-OS_VARIANT=ubuntu19.04
-OS_FAMILY=ubuntu
+OS_VARIANT=centos7.0
+#OS_VARIANT=ubuntu19.04
+#OS_FAMILY=ubuntu
+OS_FAMILY=redhat
 
-download_img "jenkins1"
-install_img "jenkins1"
+# Args
+VM_NAME=${1}
+BUILD_IMAGE="${2}"
+
+# Path to base img dir and VM image dir
+BUILD_IMG_DIR="images/jenkins/${VM_NAME}"
+BUILD_IMG_PATH="${BUILD_IMG_DIR}/${BUILD_IMAGE}"
+
+# Path to base image and VM image
+LIBVIRT_IMG_DIR="/var/lib/libvirt/images"
+LIBVIRT_BUILD_IMG_DIR="/var/lib/libvirt/images/${VM_NAME}"
+LIBVIRT_BUILD_IMG_PATH="${LIBVIRT_BUILD_IMG_DIR}/${VM_NAME}.qcow2"
+
+# Create libvirt img dirs
+mkdir -p $LIBVIRT_BUILD_IMG_DIR
+
+#download_img "jenkins1"
+#install_img "jenkins1"
 

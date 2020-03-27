@@ -1,5 +1,6 @@
 {
   "variables": {
+    "image_build": "base",
     "version": "1908",
     "deploy_password": "CHANGEME!"
   },
@@ -28,8 +29,8 @@
 
       "vnc_bind_address": "0.0.0.0",
 
-      "vm_name": "centos7-base.img",
-      "output_directory": "images/centos7",
+      "vm_name": "centos7-{{ user `image_build` }}.img",
+      "output_directory": "images/{{ user `image_build` }}",
 
       "http_directory": "http",
       "http_port_min": 10090,
@@ -55,10 +56,9 @@
   "provisioners":
   [
     {
-      "type": "salt-masterless",
-      "local_state_tree": "salt/states",
-      "local_pillar_roots": "salt/pillar",
-      "bootstrap_args": "-x python3"
+      "type": "shell",
+      "execute_command": "echo '{{ user `deploy_password` }}' | sudo -S bash {{ .Path }}",
+      "script": "scripts/{{ user `image_build` }}.sh"
     }
   ]
 }
