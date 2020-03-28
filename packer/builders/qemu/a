@@ -1,0 +1,9 @@
+
+  "provisioners":
+  [
+    {
+      "type": "shell",
+      "execute_command": "echo '{{ user `deploy_password` }}' | sudo -S bash {{ .Path }}",
+      "script": "scripts/{{ user `image_build` }}.sh"
+    }
+  ]

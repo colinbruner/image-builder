@@ -1,89 +1,77 @@
 #!/bin/bash
 
-function guest_mount {
-  # Mount a guest image at a local mount point
-  guestmount -a /var/lib/libvirt/images/${1}.img -m /dev/sda1 /mnt
+# VM Coniguration
+VM_VCPUS=2
+VM_MEMORY=2048
+VM_DISK_SPACE="100G"
+
+# OS Type
+OS_VARIANT=centos7.0
+#OS_VARIANT=ubuntu19.04
+
+# Change this to point to a new Cloud image base
+CLOUD_IMG_PATH="/app/image-builder/images/cloud/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2"
+
+
+function create_img {
+  # Create a CoW Snapshot of cloud Image to use as a base
+  qemu-img create -f qcow2 \
+    -o backing_file=$CLOUD_IMG_PATH \
+    $LIBVIRT_VM_IMG_PATH
 }
 
-function convert_img {
-  # Convert img to qcow2 with progress bar
-  qemu-img convert -p images/${OS_FAMILY}-images/${OS_FAMILY}-base.img /var/lib/libvirt/images/jenkins1.img
+function resize_img {
+  # Resize img
+  qemu-img resize ${LIBVIRT_VM_IMG_PATH} ${VM_DISK_SPACE}
 }
 
-function download_img {
-  #if [[ ! -f ${BASE_IMG_PATH} ]]; then
-  #  echo "Downloading image ${IMG_NAME}"
-  #  # Download ubuntu
-  #  curl -o $BASE_IMG_DIR/${IMG_NAME} https://cloud-images.ubuntu.com/daily/server/focal/current/focal-server-cloudimg-amd64.img
-  #else
-  #  echo "Image found at ${BASE_IMG_DIR}/${IMG_NAME}. Skipping download"
-  #fi
-  echo
-
-}
-
-function create_cloud_init_iso {
-  # Create cloud-init ISO
+function create_cloud_init {
+  # Generate a Cloud Init ISO to execute on boot
   genisoimage -input-charset utf-8 \
     -output \
-    ${LIBVIRT_BUILD_IMG_DIR}/${VM_NAME}-cidata.iso \
+    ${CLOUD_INIT_ISO_PATH} \
     -volid cidata \
     -joliet \
-    -rock cloud-init/*
-
+    -rock cloud-init/user-data cloud-init/${VM_NAME}/meta-data
 }
 
-function create_img_resize {
-  # Create base img
-  qemu-img create -f qcow2 -o backing_file=${BUILD_IMG_PATH} ${LIBVIRT_BUILD_IMG_PATH}
-
-  # Resize img
-  qemu-img resize ${BUILD_IMG_PATH} 20G
-}
-
-function install_img {
-  VM_NAME=${1}
-
+function start_img {
+  # Start the VM
   virt-install \
-    --memory 2048 \
-    --vcpus 2 \
+    --memory ${VM_MEMORY} \
+    --vcpus ${VM_VCPUS} \
     --name ${VM_NAME} \
-    --disk /var/lib/libvirt/images/${VM_NAME}/${VM_NAME}.qcow2,device=disk \
-    --disk /var/lib/libvirt/images/${VM_NAME}/${VM_NAME}-cidata.iso,device=cdrom \
+    --disk ${LIBVIRT_VM_IMG_PATH},device=disk \
+    --disk ${CLOUD_INIT_ISO_PATH},device=cdrom \
     --os-type Linux \
     --os-variant ${OS_VARIANT} \
     --virt-type kvm \
-    --graphics none \
+    --graphics vnc,listen=0.0.0.0 \
     --network type='direct',trustGuestRxFilters='no',source='eno1',source.mode='bridge' \
     --import \
     --noautoconsole
-
-  dig ${VM_NAME}.home +short
-
 }
 
-#TODO: Map this later using OS_FAMILY
-OS_VARIANT=centos7.0
-#OS_VARIANT=ubuntu19.04
-#OS_FAMILY=ubuntu
-OS_FAMILY=redhat
-
-# Args
+# Full VM Name
 VM_NAME=${1}
-BUILD_IMAGE="${2}"
+# Full VM Name without digits
+VM_NAME_ALPHA=${VM_NAME//[[:digit:]]/}
 
-# Path to base img dir and VM image dir
-BUILD_IMG_DIR="images/jenkins/${VM_NAME}"
-BUILD_IMG_PATH="${BUILD_IMG_DIR}/${BUILD_IMAGE}"
+# Libvirt image pathing information
+LIBVIRT_VM_DIR="/var/lib/libvirt/images/${VM_NAME}/"
+LIBVIRT_VM_IMG_PATH="/var/lib/libvirt/images/${VM_NAME}/${VM_NAME}.qcow2"
+CLOUD_INIT_ISO_PATH="/var/lib/libvirt/images/${VM_NAME}/${VM_NAME}-cidata.iso"
 
-# Path to base image and VM image
-LIBVIRT_IMG_DIR="/var/lib/libvirt/images"
-LIBVIRT_BUILD_IMG_DIR="/var/lib/libvirt/images/${VM_NAME}"
-LIBVIRT_BUILD_IMG_PATH="${LIBVIRT_BUILD_IMG_DIR}/${VM_NAME}.qcow2"
+# Ensure directory exists
+mkdir -p $LIBVIRT_VM_DIR
 
-# Create libvirt img dirs
-mkdir -p $LIBVIRT_BUILD_IMG_DIR
-
-#download_img "jenkins1"
-#install_img "jenkins1"
-
+### main
+if [[ $VM_NAME == "destroy" ]]; then
+  virsh destroy $2
+  virsh undefine $2
+else
+  create_img
+  resize_img
+  create_cloud_init
+  start_img
+fi
