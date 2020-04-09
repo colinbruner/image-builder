@@ -2,7 +2,7 @@
 
 # VM Coniguration
 VM_VCPUS=2
-VM_MEMORY=2048
+VM_MEMORY=4096
 VM_DISK_SPACE="100G"
 
 # OS Type
@@ -11,7 +11,7 @@ OS_VARIANT=centos7.0
 
 # Change this to point to a new Cloud image base
 CLOUD_IMG_PATH="/app/image-builder/images/cloud/CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2"
-
+CLOUD_IMG_PATH="/app/image-builder/images/cloud/focal-server-cloudimg-amd64.img"
 
 function create_img {
   # Create a CoW Snapshot of cloud Image to use as a base
@@ -32,10 +32,11 @@ function create_cloud_init {
     ${CLOUD_INIT_ISO_PATH} \
     -volid cidata \
     -joliet \
-    -rock cloud-init/user-data cloud-init/${VM_NAME}/meta-data
+    -rock cloud-init/${VM_NAME}/user-data cloud-init/${VM_NAME}/meta-data
 }
 
 function start_img {
+    #--network type='direct',trustGuestRxFilters='no',source='eno1',source.mode='bridge' \
   # Start the VM
   virt-install \
     --memory ${VM_MEMORY} \
@@ -47,13 +48,18 @@ function start_img {
     --os-variant ${OS_VARIANT} \
     --virt-type kvm \
     --graphics vnc,listen=0.0.0.0 \
-    --network type='direct',trustGuestRxFilters='no',source='eno1',source.mode='bridge' \
+    --network type='direct',trustGuestRxFilters='no',source='eno1' \
     --import \
     --noautoconsole
 }
 
 # Full VM Name
 VM_NAME=${1}
+if [[ ! ${VM_NAME} ]]; then
+  echo "Please provide a VM to start."
+  exit
+fi
+
 # Full VM Name without digits
 VM_NAME_ALPHA=${VM_NAME//[[:digit:]]/}
 
@@ -69,6 +75,8 @@ mkdir -p $LIBVIRT_VM_DIR
 if [[ $VM_NAME == "destroy" ]]; then
   virsh destroy $2
   virsh undefine $2
+elif [[ $2 == "start" ]]; then
+  start_img
 else
   create_img
   resize_img
