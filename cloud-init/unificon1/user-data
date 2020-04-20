@@ -1,0 +1,100 @@
+#cloud-config
+users:
+  - name: cbruner
+    ssh-authorized-keys: 
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDUQvKIZGnWnyC+yPsUJI6xqW4ZJjt+t164OOpl3IU/4tXzQWO2zpZSu/kIkLxSDVlIpEHm1QYCxoDtdX0M5xHfHyYAlArJXX0FQtLKRnJJQfvzuh6Ea5ffiADNhZKbrj1nNDclRAatVU0eetsmeIJ3tjTm9YwKAFf9yO5NpuXVluERjBi3gYkQem7decazSEUimgtTNP75FKzW0nKAGa5eTySTha9P/nDgOluSQytkqlFOyPKeGm5Gyy93PGFFWYRW2BloViMOTHE2ubtda31krzOD9m5s58wBCnOciE1YIDJNS7AKf/ZFAseyiAOhSNi2fVe4wKA3QjIXFPsRNaJ colin.d.bruner@gmail.com
+
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    groups: sudo
+    shell: /bin/bash
+
+apt:
+  sources:
+    saltstack:
+      source: "deb http://repo.saltstack.com/py3/ubuntu/18.04/amd64/latest bionic main"
+      key: |
+        -----BEGIN PGP PUBLIC KEY BLOCK-----
+        Version: GnuPG v2
+        
+        mQENBFOpvpgBCADkP656H41i8fpplEEB8IeLhugyC2rTEwwSclb8tQNYtUiGdna9
+        m38kb0OS2DDrEdtdQb2hWCnswxaAkUunb2qq18vd3dBvlnI+C4/xu5ksZZkRj+fW
+        tArNR18V+2jkwcG26m8AxIrT+m4M6/bgnSfHTBtT5adNfVcTHqiT1JtCbQcXmwVw
+        WbqS6v/LhcsBE//SHne4uBCK/GHxZHhQ5jz5h+3vWeV4gvxS3Xu6v1IlIpLDwUts
+        kT1DumfynYnnZmWTGc6SYyIFXTPJLtnoWDb9OBdWgZxXfHEcBsKGha+bXO+m2tHA
+        gNneN9i5f8oNxo5njrL8jkCckOpNpng18BKXABEBAAG0MlNhbHRTdGFjayBQYWNr
+        YWdpbmcgVGVhbSA8cGFja2FnaW5nQHNhbHRzdGFjay5jb20+iQE4BBMBAgAiBQJT
+        qb6YAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRAOCKFJ3le/vhkqB/0Q
+        WzELZf4d87WApzolLG+zpsJKtt/ueXL1W1KA7JILhXB1uyvVORt8uA9FjmE083o1
+        yE66wCya7V8hjNn2lkLXboOUd1UTErlRg1GYbIt++VPscTxHxwpjDGxDB1/fiX2o
+        nK5SEpuj4IeIPJVE/uLNAwZyfX8DArLVJ5h8lknwiHlQLGlnOu9ulEAejwAKt9CU
+        4oYTszYM4xrbtjB/fR+mPnYh2fBoQO4d/NQiejIEyd9IEEMd/03AJQBuMux62tjA
+        /NwvQ9eqNgLw9NisFNHRWtP4jhAOsshv1WW+zPzu3ozoO+lLHixUIz7fqRk38q8Q
+        9oNR31KvrkSNrFbA3D89uQENBFOpvpgBCADJ79iH10AfAfpTBEQwa6vzUI3Eltqb
+        9aZ0xbZV8V/8pnuU7rqM7Z+nJgldibFk4gFG2bHCG1C5aEH/FmcOMvTKDhJSFQUx
+        uhgxttMArXm2c22OSy1hpsnVG68G32Nag/QFEJ++3hNnbyGZpHnPiYgej3FrerQJ
+        zv456wIsxRDMvJ1NZQB3twoCqwapC6FJE2hukSdWB5yCYpWlZJXBKzlYz/gwD/Fr
+        GL578WrLhKw3UvnJmlpqQaDKwmV2s7MsoZogC6wkHE92kGPG2GmoRD3ALjmCvN1E
+        PsIsQGnwpcXsRpYVCoW7e2nW4wUf7IkFZ94yOCmUq6WreWI4NggRcFC5ABEBAAGJ
+        AR8EGAECAAkFAlOpvpgCGwwACgkQDgihSd5Xv74/NggA08kEdBkiWWwJZUZEy7cK
+        WWcgjnRuOHd4rPeT+vQbOWGu6x4bxuVf9aTiYkf7ZjVF2lPn97EXOEGFWPZeZbH4
+        vdRFH9jMtP+rrLt6+3c9j0M8SIJYwBL1+CNpEC/BuHj/Ra/cmnG5ZNhYebm76h5f
+        T9iPW9fFww36FzFka4VPlvA4oB7ebBtquFg3sdQNU/MmTVV4jPFWXxh4oRDDR+8N
+        1bcPnbB11b5ary99F/mqr7RgQ+YFF0uKRE3SKa7a+6cIuHEZ7Za+zhPaQlzAOZlx
+        fuBmScum8uQTrEF5+Um5zkwC7EXTdH1co/+/V/fpOtxIg4XO4kcugZefVm5ERfVS
+        MA==
+        =dtMN
+        -----END PGP PUBLIC KEY BLOCK-----
+
+    unifi:
+      source: "deb https://www.ui.com/downloads/unifi/debian stable ubiquiti"
+    mongodb-org:
+      source: "deb https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse"
+      key: |
+        -----BEGIN PGP PUBLIC KEY BLOCK-----
+        Version: GnuPG v1
+        
+        mQINBFaUNhsBEACkTlpL9xCrlirl77tahFzzd9ccTc5wP+M3oob18GIaMYKicjbR
+        h6J6ytCiXCkl65zYKvQdLkt8qlkBVc5DxGeJvD41IY3NzGPz+BZ9pFFBndAE+JEP
+        ng0ULLxzUDmWXIoukdHqf92BSizTFd2A8v+YGuwOkNBdPi/BHkwiViAaAKDZm/4k
+        9LZeOF0v7gZF89QD75NrSCKo5SGFRb8Cxi4KR4cS/jPuQVjd+B9fWkc74BUWE91t
+        3R87Uypd+1qnmoN6cOssLZ4s8n/cyOCkVphGmk1tDDhbEsI4knOqtPXaBHiC4lVI
+        ghpTHEDUuDfbQ7scySae8/YItTC/vVGngiJmZSfZU5AvVspe6rfkHQHqZs3gYMqj
+        XPl7acviEAZ7OiMp9diq6Kgp+xLRvRGL+jtUjLkP5O4gJlnxCm7YWrYfYA/vHULD
+        MyIGSBzuESGxL+Ygz+Dc0Aim9NPM5KhpV5FoAXNt50cn6n1adIwbUciRY0zBXKAI
+        Vj6D+j3e0ozsO+GGEpmQFAIo1h7CEn8VV61WaLz2F60LKR8d/DEMZ7SY8uznbzkm
+        TJCeCp/pTnPeGwkyJmJ78LAaKw2tSCeEAfRlnzPeQeanOnEX/wnAjHHAHewvGgQe
+        GW1QkEdy8zNmfODDf9wqknBShaFRHAOAQFEgBAkYHuT4SgHqW8TVDtF3CQARAQAB
+        tDdNb25nb0RCIDMuNCBSZWxlYXNlIFNpZ25pbmcgS2V5IDxwYWNrYWdpbmdAbW9u
+        Z29kYi5jb20+iQI+BBMBAgAoAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUC
+        XelghwUJELsr3gAKCRC8cR+boVcDxrgRD/9QgxS6WpFCUF0F/VPF/m2iOJPX9LeZ
+        Da6w3tR4nQadGLNanq1OebWJ7E7GbmHk7rrC2ZsvG7fj0ldd/gg0nk3tQiS27APw
+        nknjUkH4Cxmdcup9woXLf7rx42abF1UQPq6aDGZp+UVHv+K1Gkbu49pzQQThRfJl
+        ldoNWLzfqZSV/7T4UWI2xmQTgE62uc5a4GUFEauq4kiUHjyyDdANU3oNamRxI1UQ
+        xPNlgRD3gKWoq97oMZzAFJgf/2ATzs5XYu8iKOPbu7wOpNNT9PZ+Tom0VTiGCLWu
+        xWvcsCwJk3oxNYwOcRrZhYxjJFi+3QzNYKuCx5BHObOW3XWzkT/KX9JZYBAB0/th
+        KdPcUuN+3tdCLICaerXIx0CfK2yyFWqfwxyijN6W1CMPyHmLYQokR/xMi1+A6w3O
+        qCv/r88oFk9+ISSz4TyDJF3t6ussAgzKI6mHFEJfGTEDTIFbN5wUiRYetzqqaKNT
+        qAZ0MeOy5fK5gE3bcO6nJPz+5FkcDX+FzgF2pAzfLG6KDzAdc4QvSRrj9+5+8PBR
+        LPLoRhRzxPq5gE178kDjlfVqTD5KjM2ZbYysbiTJK205+Rf3gRHmoPLdjhuHQ6oh
+        HzjdMFwuWxAIZg3Aywc8Ul6PA6FWoo8KhSr5shmN2788q8LHuhQyMXigKlXpKoNc
+        ucNnPDF7CxixRQ==
+        =d4Uq
+        -----END PGP PUBLIC KEY BLOCK-----
+
+packages:
+  - nfs-common
+  - ca-certificates 
+  - apt-transport-https 
+package_update: true
+package_upgrade: true
+
+salt_minion:
+  conf:
+    master: salt.home
+  grains:
+    role: unificon
+
+runcmd:
+  - wget -qO - "https://www.mongodb.org/static/pgp/server-3.4.asc" | apt-key add -
+  - wget -O /etc/apt/trusted.gpg.d/unifi-repo.gpg https://dl.ui.com/unifi/unifi-repo.gpg 
+  - apt-get update -y && apt-get install unifi -y

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-virsh destroy jenkins1
-virsh undefine jenkins1
-#if [[ $2 == 'kill' ]]; then
-rm -rf /var/lib/libvirt/images/jenkins1
+# NOTE: Quick script to clean and rebuild for testing.
+
+virsh destroy unificon1
+virsh undefine unificon1
+rm -rf /var/lib/libvirt/images/unificon1
