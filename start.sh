@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # VM Coniguration
-VM_VCPUS=2
+VM_VCPUS=4
 VM_MEMORY=4096
 VM_DISK_SPACE="100G"
 
@@ -55,20 +55,23 @@ function start_img {
     --noautoconsole
 }
 
-# Full VM Name
+# VM hostname
 VM_NAME=${1}
 if [[ ! ${VM_NAME} ]]; then
   echo "Please provide a VM to start."
-  exit
+  exit 1
+elif [[ ! -d "/machines/images" ]]; then
+  echo "Please ensure /machines is mounted on system."
+  exit 2
 fi
 
-# Full VM Name without digits
+# VM hostname without digits
 VM_NAME_ALPHA=${VM_NAME//[[:digit:]]/}
 
 # Libvirt image pathing information
-LIBVIRT_VM_DIR="/var/lib/libvirt/images/${VM_NAME}/"
-LIBVIRT_VM_IMG_PATH="/var/lib/libvirt/images/${VM_NAME}/${VM_NAME}.qcow2"
-CLOUD_INIT_ISO_PATH="/var/lib/libvirt/images/${VM_NAME}/${VM_NAME}-cidata.iso"
+LIBVIRT_VM_DIR="/machines/images/${VM_NAME}/"
+LIBVIRT_VM_IMG_PATH="/machines/images/${VM_NAME}/${VM_NAME}.qcow2"
+CLOUD_INIT_ISO_PATH="/machines/images/${VM_NAME}/${VM_NAME}-cidata.iso"
 
 # Ensure directory exists
 mkdir -p $LIBVIRT_VM_DIR
