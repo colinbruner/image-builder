@@ -59,6 +59,4 @@ salt_minion:
     role: k8smaster
 
 #runcmd:
-#  - wget -qO - "https://www.mongodb.org/static/pgp/server-3.4.asc" | apt-key add -
-#  - wget -O /etc/apt/trusted.gpg.d/unifi-repo.gpg https://dl.ui.com/unifi/unifi-repo.gpg 
-#  - apt-get update -y && apt-get install unifi -y
+#  - curl -sfL https://get.k3s.io | sh -

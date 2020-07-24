@@ -15,18 +15,21 @@ OS_VARIANT=ubuntu18.04
 CLOUD_IMG_PATH="/app/image-builder/images/cloud/bionic-server-cloudimg-amd64.img"
 
 function create_img {
-  # Create a CoW Snapshot of cloud Image to use as a base
+  echo "Creating Image..."
+  # Create a CoW Snapshot of Cloud Image to use as a base
   qemu-img create -f qcow2 \
     -o backing_file=$CLOUD_IMG_PATH \
     $LIBVIRT_VM_IMG_PATH
 }
 
 function resize_img {
+  echo "Resizing Image..."
   # Resize img
   qemu-img resize ${LIBVIRT_VM_IMG_PATH} ${VM_DISK_SPACE}
 }
 
 function create_cloud_init {
+  echo "Creating cloud-init..."
   # Generate a Cloud Init ISO to execute on boot
   genisoimage -input-charset utf-8 \
     -output \
@@ -37,9 +40,8 @@ function create_cloud_init {
 }
 
 function start_img {
-    #--network type='direct',trustGuestRxFilters='no',source='eno1',source.mode='bridge' \
-    #--network type='direct',trustGuestRxFilters='no',source='eno1' \
   # Start the VM
+  echo "Starting VM..."
   virt-install \
     --memory ${VM_MEMORY} \
     --vcpus ${VM_VCPUS} \
